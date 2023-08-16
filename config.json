@@ -1,0 +1,21 @@
+{
+  "year": 2022,
+  "session": "",
+  "build_dir": "build",
+  "compiler": {
+    "path": "/usr/bin/g++",
+    "args": [
+      "-std=c++20",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-Werror=format=2",
+      "-Werror=init-self",
+      "-Werror=missing-include-dirs",
+      "-Werror=pointer-arith",
+      "-fsanitize=address",
+      "-fdiagnostics-color=always"
+    ]
+  }
+}

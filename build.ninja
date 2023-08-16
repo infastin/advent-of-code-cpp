@@ -1,0 +1,19 @@
+cxx = /usr/bin/g++
+cpp_args = -std=c++20 -g -Wall -Wextra -Wpedantic -Werror=format=2 -Werror=init-self -Werror=missing-include-dirs -Werror=pointer-arith -fsanitize=address -fdiagnostics-color=always
+
+rule cpp_compiler
+  command = $cxx $cpp_args $ARGS -MD -MQ $out -MF $DEPFILE -o $out -c $in
+  depfile = $DEPFILE
+  description = Compiling C++ object $out
+
+rule cpp_linker
+  command = $cxx $cpp_args $ARGS -o $out $in $LINK_ARGS
+  description = Linking C++ executable $out
+
+build build/src/1/1.cpp.o: cpp_compiler src/1/1.cpp
+  DEPFILE = build/src/1/1.cpp.o.d
+  ARGS = -Isrc
+build build/src/1/main.cpp.o: cpp_compiler src/1/main.cpp
+  DEPFILE = build/src/1/main.cpp.o.d
+  ARGS = -Isrc
+build build/src/1/main: cpp_linker build/src/1/main.cpp.o build/src/1/1.cpp.o data/objects/1.o
