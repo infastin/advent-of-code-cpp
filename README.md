@@ -88,3 +88,10 @@ Also you can write the following to build all solutions:
 ```
 
 This will build and run the solution for the given day.
+
+### compile_commands.json
+
+If you need to use `compile_commands.json`, you can generate it with the following command:
+```bash
+./aoc compdb
+```
