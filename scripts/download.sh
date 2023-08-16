@@ -63,7 +63,7 @@ fi
 if [[ -n "$MARKDOWN" ]]; then
 	if [[ -n "$HTML" ]]; then
 		sed -n "/<main>/,/<\/main>/p" "$HTML" | pandoc -f html -t markdown_strict-raw_html -o "$MARKDOWN"
-	else
+	elif command -v pandoc &>/dev/null; then
 		curl -s -b "session=$SESSION" "https://adventofcode.com/$YEAR/day/$DAY" \
 			| sed -n "/<main>/,/<\/main>/p" \
 			| pandoc -f html -t markdown_strict-raw_html -o "$MARKDOWN"

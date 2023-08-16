@@ -89,7 +89,7 @@ function init() {
 
 	mkdir -p "$SRC_DIR/$day"
 
-	./$DOWNLOAD \
+	command $DOWNLOAD \
 		-s "$SESSION" \
 		-d "$day" \
 		-y "$YEAR" \
@@ -97,7 +97,7 @@ function init() {
 		-t "$DATA_DIR/html/$day.html" \
 		-m "$DATA_DIR/markdown/$day.md"
 
-	./$BIN2C \
+	command $BIN2C \
 		-o "$SRC_DIR/$day/input.hpp" \
 		-b "$DATA_DIR/objects/$day.o" \
 		"$DATA_DIR/inputs/$day.txt"
@@ -189,7 +189,7 @@ function run() {
 	fi
 
 	ninja "$BUILD_DIR/$SRC_DIR/$day/main"
-	./$BUILD_DIR/$SRC_DIR/$day/main
+	command $BUILD_DIR/$SRC_DIR/$day/main
 }
 
 function build() {
