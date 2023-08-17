@@ -15,7 +15,8 @@
       "-Werror=missing-include-dirs",
       "-Werror=pointer-arith",
       "-fsanitize=address",
-      "-fdiagnostics-color=always"
+      "-fdiagnostics-color=always",
+      "-funsigned-char"
     ]
   }
 }

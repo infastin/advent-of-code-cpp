@@ -60,6 +60,8 @@ cat <<EOF > "$HEADER"
 
 #include <cstdint>
 #include <string_view>
+#include <ranges>
+#include <algorithm>
 
 namespace aoc {
 
@@ -79,6 +81,7 @@ echo -e "}\n" >> "$HEADER"
 for INPUT in "$@"; do
 	SYMBOL=${INPUT//[.\/-]/_}
 	echo "static const size_t _binary_${SYMBOL}_size = _binary_${SYMBOL}_end - _binary_${SYMBOL}_start;" >> "$HEADER"
+	echo "static const std::string_view _binary_${SYMBOL}{detail::_binary_${SYMBOL}_start, detail::_binary_${SYMBOL}_size};" >> "$HEADER"
 done
 
 echo -e "\n} // namespace detail\n" >> "$HEADER"
@@ -86,7 +89,14 @@ echo -e "\n} // namespace detail\n" >> "$HEADER"
 for INPUT in "$@"; do
 	BASE=$(basename "${INPUT%.*}")
 	SYMBOL=${INPUT//[.\/-]/_}
-	echo "static const std::string_view ${PREFIX}_${BASE}{detail::_binary_${SYMBOL}_start, detail::_binary_${SYMBOL}_size};" >> "$HEADER"
+
+	cat <<EOF >> "$HEADER"
+static const std::string_view ${PREFIX}_${BASE}{
+	detail::_binary_${SYMBOL}.begin(),
+	std::ranges::find_if_not(detail::_binary_${SYMBOL} | std::views::reverse,
+		[](char c) { return std::isspace(c); }).base()
+};
+EOF
 done
 
 cat <<EOF >> "$HEADER"

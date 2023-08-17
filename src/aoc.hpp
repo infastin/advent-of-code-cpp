@@ -52,10 +52,14 @@ run_test(std::string_view input, Fn fn, std::optional<uint64_t> expected)
 {
   std::optional<uint64_t> result = fn(input);
   if (result.has_value()) {
-    if (result.value() == expected.value()) {
-      std::cout << std::format("Test passed: {} == {}\n", result.value(), expected.value());
+    if (expected.has_value()) {
+      if (result.value() == expected.value()) {
+        std::cout << std::format("Test passed: {} == {}\n", result.value(), expected.value());
+      } else {
+        std::cout << std::format("Test failed: {} != {}\n", result.value(), expected.value());
+      }
     } else {
-      std::cout << std::format("Test failed: {} != {}\n", result.value(), expected.value());
+      std::cout << std::format("Test failed: {} != no result\n", result.value());
     }
   } else {
     if (expected.has_value()) {
