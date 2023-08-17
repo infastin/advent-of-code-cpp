@@ -91,7 +91,7 @@ for INPUT in "$@"; do
 	cat <<EOF >> "$HEADER"
 static const std::string_view ${PREFIX}_${BASE}{
   detail::_binary_${SYMBOL}.data(),
-  detail::_binary_${SYMBOL}.find_last_not_of("\n\t\r\v\f")
+  detail::_binary_${SYMBOL}.find_last_not_of("\n\t\r\v\f")+1
 };
 EOF
 done
