@@ -7,8 +7,8 @@ function usage() {
 Usage: $0 [options] <input files>
 Options:
   -h           Display this message
-	-p <prefix>  Prefix for the generated variables
-	             (default: name of the header file without extension)
+  -p <prefix>  Prefix for the generated variables
+               (default: name of the header file without extension)
   -o <file>    Output header file
   -b <file>    Output binary file
 EOF
@@ -72,8 +72,8 @@ EOF
 
 for INPUT in "$@"; do
 	SYMBOL=${INPUT//[.\/-]/_}
-	echo "extern const char _binary_${SYMBOL}_start[];" >> "$HEADER"
-	echo "extern const char _binary_${SYMBOL}_end[];" >> "$HEADER"
+	echo "  extern const char _binary_${SYMBOL}_start[];" >> "$HEADER"
+	echo "  extern const char _binary_${SYMBOL}_end[];" >> "$HEADER"
 done
 
 echo -e "}\n" >> "$HEADER"
@@ -92,9 +92,8 @@ for INPUT in "$@"; do
 
 	cat <<EOF >> "$HEADER"
 static const std::string_view ${PREFIX}_${BASE}{
-	detail::_binary_${SYMBOL}.begin(),
-	std::ranges::find_if_not(detail::_binary_${SYMBOL} | std::views::reverse,
-		[](char c) { return std::isspace(c); }).base()
+  detail::_binary_${SYMBOL}.data(),
+  detail::_binary_${SYMBOL}.find_last_not_of("\n\t\r\v\f")
 };
 EOF
 done
