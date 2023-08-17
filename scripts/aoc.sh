@@ -14,6 +14,8 @@ Commands:
   test      Run a day's tests
   compdb    Generate a compilation database
   examples  Regenerate an examples' header and object files
+  input     Regenarate an input's header and object files
+  download  Download a day's input and HTML
 EOF
 }
 
@@ -38,6 +40,47 @@ function prepare() {
 	BUILD_DIR=$(jq -r '.build_dir' "$CONFIG")
 	YEAR=$(jq -r '.year' "$CONFIG")
 	SESSION=$(jq -r '.session' "$CONFIG")
+}
+
+function assert_buildfile() {
+	if ! [[ -f "build.ninja" ]]; then
+		echo "Please run setup first"
+		exit 1
+	fi
+}
+
+function assert_day() {
+	day=$1
+
+	if [[ -z "$day" ]]; then
+		echo "Please specify a day"
+		exit 1
+	fi
+
+	if ! [[ $day =~ ^[0-9]{1,2}$ ]] && [[ $day > 0 && day < 32 ]]; then
+		echo "Day must be a one- or two-digit number between 1 and 31"
+		exit 1
+	fi
+}
+
+function assert_day_exists() {
+	day=$1
+	assert_day $day
+
+	if ! [[ -d "$SRC_DIR/$day" ]]; then
+		echo "Day $day doesn't exist"
+		exit 1
+	fi
+}
+
+function assert_day_not_exists() {
+	day=$1
+	assert_day $day
+
+	if [[ -d "$SRC_DIR/$day" ]]; then
+		echo "Day $day already exists"
+		exit 1
+	fi
 }
 
 function setup() {
@@ -70,37 +113,24 @@ EOF
 function init() {
 	day=$1
 
-	if ! [[ -f "build.ninja" ]]; then
-		echo "Please run setup first"
-		exit 1
-	fi
-
-	if [[ -z "$day" ]]; then
-		echo "Please specify a day"
-		exit 1
-	fi
-
-	if ! [[ $day =~ ^[0-9]{1,2}$ ]] && [[ $day > 0 && day < 32 ]]; then
-		echo "Day must be a one- or two-digit number between 1 and 31"
-		exit 1
-	fi
-
-	if [[ -d "$SRC_DIR/$day" ]]; then
-		echo "Day $day already exists"
-		exit 1
-	fi
+	assert_buildfile
+	assert_day_not_exists $day
 
 	mkdir -p "$SRC_DIR/$day"
 	mkdir -p "$DATA_DIR/examples/$day"
 	touch "$DATA_DIR/examples/$day/1.txt"
 
-	command $DOWNLOAD \
-		-s "$SESSION" \
-		-d "$day" \
-		-y "$YEAR" \
-		-o "$DATA_DIR/inputs/$day.txt" \
-		-t "$DATA_DIR/html/$day.html" \
-		-m "$DATA_DIR/markdown/$day.md"
+	if [[ -n "$SESSION" ]]; then
+		command $DOWNLOAD \
+			-s "$SESSION" \
+			-d "$day" \
+			-y "$YEAR" \
+			-o "$DATA_DIR/inputs/$day.txt" \
+			-t "$DATA_DIR/html/$day.html" \
+			-m "$DATA_DIR/markdown/$day.md"
+	else
+		touch "$DATA_DIR/inputs/$day.txt"
+	fi
 
 	command $BIN2C \
 		-o "$SRC_DIR/$day/input.hpp" \
@@ -197,25 +227,8 @@ EOF
 function run() {
 	day=$1
 
-	if ! [[ -f "build.ninja" ]]; then
-		echo "Please run setup first"
-		exit 1
-	fi
-
-	if [[ -z "$day" ]]; then
-		echo "Please specify a day"
-		exit 1
-	fi
-
-	if ! [[ $day =~ ^[0-9]{1,2}$ ]] && [[ $day > 0 && day < 32 ]]; then
-		echo "Day must be a one- or two-digit number between 1 and 31"
-		exit 1
-	fi
-
-	if ! [[ -d "$SRC_DIR/$day" ]]; then
-		echo "Day $day doesn't exist"
-		exit 1
-	fi
+	assert_buildfile
+	assert_day_exists $day
 
 	ninja "$BUILD_DIR/$SRC_DIR/$day/main"
 	command $BUILD_DIR/$SRC_DIR/$day/main
@@ -224,25 +237,8 @@ function run() {
 function test() {
 	day=$1
 
-	if ! [[ -f "build.ninja" ]]; then
-		echo "Please run setup first"
-		exit 1
-	fi
-
-	if [[ -z "$day" ]]; then
-		echo "Please specify a day"
-		exit 1
-	fi
-
-	if ! [[ $day =~ ^[0-9]{1,2}$ ]] && [[ $day > 0 && day < 32 ]]; then
-		echo "Day must be a one- or two-digit number between 1 and 31"
-		exit 1
-	fi
-
-	if ! [[ -d "$SRC_DIR/$day" ]]; then
-		echo "Day $day doesn't exist"
-		exit 1
-	fi
+	assert_buildfile
+	assert_day_exists $day
 
 	ninja "$BUILD_DIR/$SRC_DIR/$day/test"
 	command $BUILD_DIR/$SRC_DIR/$day/test
@@ -251,72 +247,68 @@ function test() {
 function build() {
 	day=$1
 
-	if ! [[ -f "build.ninja" ]]; then
-		echo "Please run setup first"
-		exit 1
-	fi
+	assert_buildfile
 
-	if [[ $1 == "all" ]]; then
+	if [[ -z $day ]] || [[ $day == "all" ]]; then
 		ninja
 		exit 0
 	fi
 
-	if [[ -z "$day" ]]; then
-		echo "Please specify a day"
-		exit 1
-	fi
-
-	if ! [[ $day =~ ^[0-9]{1,2}$ ]] && [[ $day > 0 && day < 32 ]]; then
-		echo "Day must be a one- or two-digit number between 1 and 31"
-		exit 1
-	fi
-
-	if ! [[ -d "$SRC_DIR/$day" ]]; then
-		echo "Day $day doesn't exist"
-		exit 1
-	fi
+	assert_day_exists $day
 
 	ninja "$BUILD_DIR/$SRC_DIR/$day/main"
 	ninja "$BUILD_DIR/$SRC_DIR/$day/test"
 }
 
 function compdb() {
-	if ! [[ -f "build.ninja" ]]; then
-		echo "Please run setup first"
-		exit 1
-	fi
-
+	assert_buildfile
 	ninja -t compdb > compile_commands.json
 }
 
 function examples() {
 	day=$1
 
-	if ! [[ -f "build.ninja" ]]; then
-		echo "Please run setup first"
-		exit 1
-	fi
-
-	if [[ -z "$day" ]]; then
-		echo "Please specify a day"
-		exit 1
-	fi
-
-	if ! [[ $day =~ ^[0-9]{1,2}$ ]] && [[ $day > 0 && day < 32 ]]; then
-		echo "Day must be a one- or two-digit number between 1 and 31"
-		exit 1
-	fi
-
-	if ! [[ -d "$SRC_DIR/$day" ]]; then
-		echo "Day $day doesn't exist"
-		exit 1
-	fi
+	assert_buildfile
+	assert_day_exists $day
 
 	command $BIN2C \
 		-o "$SRC_DIR/$day/examples.hpp" \
 		-b "$DATA_DIR/objects/examples$day.o" \
 		-p "example" \
 		$DATA_DIR/examples/$day/*.txt
+}
+
+function input() {
+	day=$1
+
+	assert_buildfile
+	assert_day_exists $day
+
+	command $BIN2C \
+		-o "$SRC_DIR/$day/input.hpp" \
+		-b "$DATA_DIR/objects/input$day.o" \
+		-p "input" \
+		"$DATA_DIR/inputs/$day.txt"
+}
+
+function download() {
+	day=$1
+
+	assert_buildfile
+	assert_day_exists $day
+
+	if [[ -z "$SESSION" ]]; then
+		echo "Please specify a session cookie in config.json"
+		exit 1
+	fi
+
+	command $DOWNLOAD \
+		-s "$SESSION" \
+		-d "$day" \
+		-y "$YEAR" \
+		-o "$DATA_DIR/inputs/$day.txt" \
+		-t "$DATA_DIR/html/$day.html" \
+		-m "$DATA_DIR/markdown/$day.md"
 }
 
 if [[ $# < 1 ]]; then
@@ -335,5 +327,7 @@ case $1 in
 	test) test $2 ;;
 	compdb) compdb ;;
 	examples) examples $2 ;;
+	input) input $2 ;;
+	download) download $2 ;;
 	*) usage; exit 1 ;;
 esac
