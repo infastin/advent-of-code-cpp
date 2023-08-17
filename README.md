@@ -59,7 +59,7 @@ This will create all necessary directories and files:
 ├── data                      # Data directory
 │   ├── examples              # Examples directory
 │   │   └── <day>             # Directory containing examples for day <day> 
-│   │       └── <examples>    # Text files with examples of input data
+│   │       └── <example>.txt # Text files with examples of input data
 │   ├── html                  # Directory containing html files with puzzle descriptions
 │   │   └── <day>.html        # Html file with puzzle description for day <day>
 │   ├── inputs                # Directory containing input files
