@@ -6,14 +6,14 @@ function usage() {
 	cat <<EOF
 Usage: $0 <command> [args]
 Commands:
-  help     Display this message
-  setup    Setup the project
-  init     Initialise a new day
-  build    Build a day's solution and tests
-  run      Run a day's solution
-  test     Run a day's tests
-  compdb   Generate a compilation database
-  example  Regenerate an example input
+  help      Display this message
+  setup     Setup the project
+  init      Initialise a new day
+  build     Build a day's solution and tests
+  run       Run a day's solution
+  test      Run a day's tests
+  compdb    Generate a compilation database
+  examples  Regenerate an examples' header and object files
 EOF
 }
 
@@ -289,7 +289,7 @@ function compdb() {
 	ninja -t compdb > compile_commands.json
 }
 
-function example() {
+function examples() {
 	day=$1
 
 	if ! [[ -f "build.ninja" ]]; then
@@ -334,6 +334,6 @@ case $1 in
 	run) run $2 ;;
 	test) test $2 ;;
 	compdb) compdb ;;
-	example) example $2 ;;
+	examples) examples $2 ;;
 	*) usage; exit 1 ;;
 esac

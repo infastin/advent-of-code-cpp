@@ -74,9 +74,9 @@ but don't change the function names and parameters.
 ./aoc build <day>
 ```
 
-This will build the solution for the given day.
+This will build the solution and tests for the given day.
 
-Also you can write the following to build all solutions:
+Also you can write the following to build all solutions and tests:
 ```bash
 ./aoc build all
 ```
@@ -88,6 +88,15 @@ Also you can write the following to build all solutions:
 ```
 
 This will build and run the solution for the given day.
+
+### Testing
+
+Write your example input to file `data/examples/<day>/1.txt` or create
+a new file inside of `data/examples/<day>` directory.
+
+Then run `./aoc examples <day>` to regenerate header and object files for day `<day>`.
+Then update expected values inside of `src/<day>/test.cpp` or add new tests
+inside of that file. Then run `./aoc test <day>` to run the tests.
 
 ### compile_commands.json
 
