@@ -60,8 +60,6 @@ cat <<EOF > "$HEADER"
 
 #include <cstdint>
 #include <string_view>
-#include <ranges>
-#include <algorithm>
 
 namespace aoc {
 
