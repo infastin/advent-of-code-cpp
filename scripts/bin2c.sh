@@ -4,11 +4,11 @@ set -e
 
 function usage() {
 	cat <<EOF
-Usage: $0 [options] <input file>
+Usage: $0 [options] <input files>
 Options:
   -h           Display this message
-	-s <suffix>  Suffix of the input variable
-	             (default: name of the input file)
+	-p <prefix>  Prefix for the generated variables
+	             (default: name of the header file without extension)
   -o <file>    Output header file
   -b <file>    Output binary file
 EOF
@@ -16,14 +16,14 @@ EOF
 
 HEADER=""
 BINARY=""
-SUFFIX=""
+PREFIX=""
 
-while getopts "ho:b:s:" opt; do
+while getopts "ho:b:p:" opt; do
 	case $opt in
 	h) usage; exit 0 ;;
 	o) HEADER="$OPTARG" ;;
 	b) BINARY="$OPTARG" ;;
-	s) SUFFIX="$OPTARG" ;;
+	p) PREFIX="$OPTARG" ;;
 	*) usage; exit 1 ;;
 	esac
 done
@@ -40,30 +40,23 @@ if [[ -z "$BINARY" ]]; then
 	exit 1
 fi
 
-if [[ $# != 1 ]]; then
-	echo "Input file is required"
+if [[ -z "$PREFIX" ]]; then
+	PREFIX=$(basename ${HEADER%.*})
+fi
+
+if [[ $# < 1 ]]; then
+	echo "At least one input file is required"
 	exit 1
-else
-	INPUT="$1"
-	if ! [[ -f "$INPUT" ]]; then
-		echo "Input file does not exist"
-		exit 1
-	fi
 fi
 
-if [[ -z "$SUFFIX" ]]; then
-	SUFFIX=$(basename "${INPUT%.*}")
-fi
+ld -r -z noexecstack -o "$BINARY" -b binary "$@"
 
-BASE=$(basename ${HEADER%.*})
-SYMBOL=${INPUT//[.\/-]/_}
-UPPER_SYMBOL=$(echo "$SYMBOL" | tr '[:lower:]' '[:upper:]')
-
-ld -r -z noexecstack -b binary "$INPUT" -o "$BINARY"
+NAME=$(basename ${HEADER%.*})
+UPPER_NAME=${NAME^^}
 
 cat <<EOF > "$HEADER"
-#ifndef AOC_$UPPER_SYMBOL
-#define AOC_$UPPER_SYMBOL
+#ifndef AOC_${UPPER_NAME}_HPP
+#define AOC_${UPPER_NAME}_HPP
 
 #include <cstdint>
 #include <string_view>
@@ -73,17 +66,32 @@ namespace aoc {
 namespace detail {
 
 extern "C" {
-	extern const char _binary_${SYMBOL}_start[];
-	extern const char _binary_${SYMBOL}_end[];
-}
+EOF
 
-static const std::size_t _binary_${SYMBOL}_size = _binary_${SYMBOL}_end - _binary_${SYMBOL}_start;
+for INPUT in "$@"; do
+	SYMBOL=${INPUT//[.\/-]/_}
+	echo "extern const char _binary_${SYMBOL}_start[];" >> "$HEADER"
+	echo "extern const char _binary_${SYMBOL}_end[];" >> "$HEADER"
+done
 
-} // namespace detail
+echo -e "}\n" >> "$HEADER"
 
-static const std::string_view input_${SUFFIX}{detail::_binary_${SYMBOL}_start, detail::_binary_${SYMBOL}_size};
+for INPUT in "$@"; do
+	SYMBOL=${INPUT//[.\/-]/_}
+	echo "static const size_t _binary_${SYMBOL}_size = _binary_${SYMBOL}_end - _binary_${SYMBOL}_start;" >> "$HEADER"
+done
+
+echo -e "\n} // namespace detail\n" >> "$HEADER"
+
+for INPUT in "$@"; do
+	BASE=$(basename "${INPUT%.*}")
+	SYMBOL=${INPUT//[.\/-]/_}
+	echo "static const std::string_view ${PREFIX}_${BASE}{detail::_binary_${SYMBOL}_start, detail::_binary_${SYMBOL}_size};" >> "$HEADER"
+done
+
+cat <<EOF >> "$HEADER"
 
 } // namespace aoc
 
-#endif /* end of include guard: AOC_$UPPER_SYMBOL */
+#endif /* end of include guard: AOC_${UPPER_NAME}_HPP */
 EOF
