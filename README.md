@@ -89,12 +89,12 @@ Otherwise, it will just create an empty input file.
 In both cases it will create the `src/<day>` directory with a bunch of files:
 ```bash
 src/<day>
-├── <day>.cpp     # Source file with solution, can be freely edited, but don't change the function names and arguments
-├── <day>.hpp     # Header file for the solution, can be freely edited, but don't change the function names and arguments
+├── <day>.cpp     # Source file with solution
+├── <day>.hpp     # Header file for the solution
 ├── examples.hpp  # Header file with examples, do not edit
 ├── input.hpp     # Header file with an input, do not edit
-├── main.cpp      # Main file, it is not recommended to edit this file
-└── test.cpp      # Test file, you can edit existing tests or add new ones
+├── main.cpp      # File that runs the solution
+└── test.cpp      # File that contains tests
 ```
 
 ### Download an input and a puzzle description

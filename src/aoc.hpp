@@ -10,16 +10,16 @@
 
 namespace aoc {
 
-template<typename Fn>
+template<typename Fn, typename T>
 concept part_fn = std::invocable<Fn, std::string_view>
-  && std::same_as<std::invoke_result_t<Fn, std::string_view>, std::optional<uint64_t>>;
+  && std::same_as<std::invoke_result_t<Fn, std::string_view>, std::optional<T>>;
 
-template<part_fn Fn>
+template<typename T, part_fn<T> Fn>
 constexpr void
 run(std::string_view input, Fn fn)
 {
   auto start = std::chrono::high_resolution_clock::now();
-  std::optional<uint64_t> result = fn(input);
+  std::optional<T> result = fn(input);
   auto end = std::chrono::high_resolution_clock::now();
 
   if (result.has_value()) {
@@ -36,21 +36,21 @@ run(std::string_view input, Fn fn)
   );
 }
 
-template<part_fn PartOne, part_fn PartTwo>
+template<typename T, part_fn<T> PartOne, part_fn<T> PartTwo>
 constexpr void
 run_all(std::string_view input, PartOne part_one, PartTwo part_two)
 {
   std::cout << "🎄 Part One 🎄\n";
-  run(input, part_one);
+  run<T>(input, part_one);
   std::cout << "🎄 Part two 🎄\n";
-  run(input, part_two);
+  run<T>(input, part_two);
 }
 
-template<part_fn Fn>
+template<typename T, part_fn<T> Fn>
 constexpr void
-run_test(std::string_view input, Fn fn, std::optional<uint64_t> expected)
+run_test(std::string_view input, Fn fn, std::optional<T> expected)
 {
-  std::optional<uint64_t> result = fn(input);
+  std::optional<T> result = fn(input);
   if (result.has_value()) {
     if (expected.has_value()) {
       if (result.value() == expected.value()) {
@@ -70,15 +70,15 @@ run_test(std::string_view input, Fn fn, std::optional<uint64_t> expected)
   }
 }
 
-template<part_fn PartOne, part_fn PartTwo>
+template<typename T, part_fn<T> PartOne, part_fn<T> PartTwo>
 constexpr void
 run_test_all(std::string_view input, PartOne part_one, PartTwo part_two,
-  std::optional<uint64_t> expected_one, std::optional<uint64_t> expected_two)
+  std::optional<T> expected_one, std::optional<T> expected_two)
 {
   std::cout << "🎄 Part One 🎄\n";
-  run_test(input, part_one, expected_one);
+  run_test<T>(input, part_one, expected_one);
   std::cout << "🎄 Part two 🎄\n";
-  run_test(input, part_two, expected_two);
+  run_test<T>(input, part_two, expected_two);
 }
 
 } // namespace aoc

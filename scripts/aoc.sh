@@ -183,10 +183,7 @@ EOF
 #include "aoc.hpp"
 
 int main()
-{
-  // It is not recommended to edit this file
-  aoc::run_all(aoc::input_${day}, part_one, part_two);
-}
+{ aoc::run_all<uint64_t>(aoc::input_${day}, part_one, part_two); }
 EOF
 
 cat <<EOF >> "$SRC_DIR/$day/test.cpp"
@@ -204,7 +201,7 @@ int main()
 {
   // Write your tests here
   // Don't forget to adjust expected values
-  aoc::run_test_all(aoc::example_1, part_one, part_two, std::nullopt, std::nullopt);
+  aoc::run_test_all<uint64_t>(aoc::example_1, part_one, part_two, std::nullopt, std::nullopt);
 }
 EOF
 
