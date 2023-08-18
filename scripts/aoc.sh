@@ -152,6 +152,9 @@ function init() {
 #include <optional>
 #include <string_view>
 
+// You can adjust return types,
+// but not function names and arguments
+
 std::optional<uint64_t>
 part_one(std::string_view);
 
@@ -163,6 +166,9 @@ EOF
 
 	cat <<EOF > "$SRC_DIR/$day/$day.cpp"
 #include "$day.hpp"
+
+// You can adjust return types,
+// but not function names and arguments
 
 std::optional<uint64_t>
 part_one(std::string_view input)
@@ -183,7 +189,10 @@ EOF
 #include "aoc.hpp"
 
 int main()
-{ aoc::run_all<uint64_t>(aoc::input_${day}, part_one, part_two); }
+{
+  // You may need to adjust the template parameters
+  aoc::run_all<uint64_t>(aoc::input_${day}, part_one, part_two);
+}
 EOF
 
 cat <<EOF >> "$SRC_DIR/$day/test.cpp"
@@ -201,6 +210,7 @@ int main()
 {
   // Write your tests here
   // Don't forget to adjust expected values
+  // You may also need to adjust the template parameters
   aoc::run_test_all<uint64_t>(aoc::example_1, part_one, part_two, std::nullopt, std::nullopt);
 }
 EOF
