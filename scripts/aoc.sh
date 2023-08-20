@@ -23,6 +23,7 @@ CONFIG=config.json
 SRC_DIR=src
 DATA_DIR=data
 SCRIPTS_DIR=scripts
+SESSION_FILE=.aoc_session
 
 BIN2C=$SCRIPTS_DIR/bin2c.sh
 DOWNLOAD=$SCRIPTS_DIR/download.sh
@@ -39,7 +40,10 @@ function prepare() {
 
 	BUILD_DIR=$(jq -r '.build_dir' "$CONFIG")
 	YEAR=$(jq -r '.year' "$CONFIG")
-	SESSION=$(jq -r '.session' "$CONFIG")
+
+	if [[ -f "$SESSION_FILE" ]]; then
+		SESSION=$(cat "$SESSION_FILE")
+	fi
 }
 
 function assert_buildfile() {
@@ -305,7 +309,7 @@ function download() {
 	assert_day_exists $day
 
 	if [[ -z "$SESSION" ]]; then
-		echo "Please specify a session cookie in config.json"
+		echo "Please set your session cookie in $SESSION_FILE"
 		exit 1
 	fi
 

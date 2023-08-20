@@ -1,6 +1,5 @@
 {
   "year": 2022,
-  "session": "",
   "build_dir": "build",
   "compiler": {
     "path": "/usr/bin/g++",

@@ -21,13 +21,12 @@ Optional:
 
 ### Configuration
 
-Inside of `config.json` set the year and session cookie.
-Also you can change the build directory, path to the compiler and compiler arguments.
+Inside of `config.json` set the year. Also you change the build directory,
+path to the compiler and compiler arguments.
 
 ```json
 {
   "year": 2022,
-  "session": "",
   "build_dir": "build",
   "compiler": {
     "path": "/usr/bin/g++",
@@ -42,11 +41,23 @@ Also you can change the build directory, path to the compiler and compiler argum
       "-Werror=missing-include-dirs",
       "-Werror=pointer-arith",
       "-fsanitize=address",
-      "-fdiagnostics-color=always"
+      "-fdiagnostics-color=always",
+      "-funsigned-char"
     ]
   }
 }
 ```
+
+Inside of `.aoc_session` file set your session cookie from the [Advent of Code](https://adventofcode.com),
+if you want to download inputs and puzzle descriptions.
+
+> In order to download inputs, you must be logged into your Advent of Code account.
+> 
+> In Chromium-based browsers, you can get your session cookie by pressing F12, going to the Application tab,
+> and copying the value of the `session` cookie.
+> 
+> In Firefox, you can get your session cookie by pressing F12, going to the Storage tab,
+> and copying the value of the `session` cookie.
 
 ### Setup
 
