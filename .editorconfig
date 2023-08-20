@@ -10,10 +10,10 @@ indent_style = space
 indent_size = 2
 tab_width = 2
 
-[{*.sh}]
+[*.sh]
 indent_style = tab
 indent_size = 2
 tab_width = 2
 
-[{*.md}]
+[*.{md,txt}]
 trim_trailing_whitespace = false
