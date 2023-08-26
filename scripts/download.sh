@@ -51,20 +51,20 @@ if ! [[ $YEAR =~ ^[0-9]{4}$ ]] && [[ $YEAR > 2000 && $YEAR < 2100 ]]; then
 fi
 
 if [[ -n "$OUTPUT" ]]; then
-	curl -s -b "session=$SESSION" "https://adventofcode.com/$YEAR/day/$DAY/input" > "$OUTPUT"
+	curl -s -S -b "session=$SESSION" "https://adventofcode.com/$YEAR/day/$DAY/input" > "$OUTPUT"
 elif [[ -z "$HTML" && -z "$MARKDOWN" ]]; then
-	curl -s -b "session=$SESSION" "https://adventofcode.com/$YEAR/day/$DAY/input"
+	curl -s -S -b "session=$SESSION" "https://adventofcode.com/$YEAR/day/$DAY/input"
 fi
 
 if [[ -n "$HTML" ]]; then
-	curl -s -b "session=$SESSION" "https://adventofcode.com/$YEAR/day/$DAY" | sed -n "/<main>/,/<\/main>/p" > "$HTML"
+	curl -s -S -b "session=$SESSION" "https://adventofcode.com/$YEAR/day/$DAY" | sed -n "/<main>/,/<\/main>/p" > "$HTML"
 fi
 
 if [[ -n "$MARKDOWN" ]]; then
 	if [[ -n "$HTML" ]]; then
 		sed -n "/<main>/,/<\/main>/p" "$HTML" | pandoc -f html -t markdown_strict-raw_html -o "$MARKDOWN"
 	elif command -v pandoc &>/dev/null; then
-		curl -s -b "session=$SESSION" "https://adventofcode.com/$YEAR/day/$DAY" \
+		curl -s -S -b "session=$SESSION" "https://adventofcode.com/$YEAR/day/$DAY" \
 			| sed -n "/<main>/,/<\/main>/p" \
 			| pandoc -f html -t markdown_strict-raw_html -o "$MARKDOWN"
 	fi
